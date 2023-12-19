@@ -1,4 +1,5 @@
 using FoodOrders.API.Data.DbContexts;
+using FoodOrders.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<FoodOrdersDbContext>(
     dbContextOptions => dbContextOptions.UseSqlServer(
         builder.Configuration["ConnectionStrings:FoodOrdersDb"]));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 
 var app = builder.Build();
 

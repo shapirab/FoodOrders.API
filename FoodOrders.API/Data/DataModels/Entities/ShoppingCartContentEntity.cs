@@ -15,5 +15,6 @@ namespace FoodOrders.API.Data.DataModels.Entities
         public int CustomerID { get; set; }
         [ForeignKey("CustomerID")]
         public CustomerEntity Customer { get; set; }
+        public DateTime Date { get; set; }
     }
 }

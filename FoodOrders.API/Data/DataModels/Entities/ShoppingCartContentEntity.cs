@@ -11,6 +11,8 @@ namespace FoodOrders.API.Data.DataModels.Entities
         public int Id { get; set; }
         [Required]
         public int Quantity { get; set; }
+        public int FoodItemID { get; set; }
+        [ForeignKey("FoodItemID")]
         public FoodItem FoodItem { get; set; }
         public int CustomerID { get; set; }
         [ForeignKey("CustomerID")]

@@ -2,9 +2,10 @@
 using FoodOrders.API.Data.DataModels.Entities;
 using FoodOrders.API.Data.DataModels.Models;
 using FoodOrders.API.Data.DbContexts;
+using FoodOrders.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace FoodOrders.API.Services
+namespace FoodOrders.API.Services.SqlImplementations
 {
     public class ShoppingCartService : IShoppingCartService
     {
@@ -15,15 +16,15 @@ namespace FoodOrders.API.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<bool> AddShoppingCart(ShoppingCartContentEntity content)
+        public async Task<bool> AddShoppingCartAsync(ShoppingCartContentEntity content)
         {
             await _context.ShoppingCartContents.AddAsync(content);
             return await SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteShoppingCart(int id)
+        public async Task<bool> DeleteShoppingCartAsync(int id)
         {
-            ShoppingCartContentEntity? shoppingCart = await GetShoppingCartById(id);
+            ShoppingCartContentEntity? shoppingCart = await GetShoppingCartByIdAsync(id);
             if (shoppingCart != null)
             {
                 _context.ShoppingCartContents.Remove(shoppingCart);
@@ -34,7 +35,7 @@ namespace FoodOrders.API.Services
         public async Task<(IEnumerable<ShoppingCartContentEntity>, PaginationMetaData)> GetAllShoppingCartsAsync
             (QueryDto? filter, string? searchQuery, int pageNumber, int pageSize)
         {
-            IQueryable<ShoppingCartContentEntity> collection = 
+            IQueryable<ShoppingCartContentEntity> collection =
                 _context.ShoppingCartContents as IQueryable<ShoppingCartContentEntity>;
 
             if (!string.IsNullOrEmpty(searchQuery))
@@ -55,7 +56,7 @@ namespace FoodOrders.API.Services
             return (collectionToReturn, paginationMetadata);
         }
 
-        public async Task<ShoppingCartContentEntity?> GetShoppingCartById(int id)
+        public async Task<ShoppingCartContentEntity?> GetShoppingCartByIdAsync(int id)
         {
             return await _context.ShoppingCartContents
                 .Where(shoppingCart => shoppingCart.Id == id).FirstOrDefaultAsync();
@@ -84,7 +85,7 @@ namespace FoodOrders.API.Services
             }
             else if (filter?.CustomerID != null && filter?.Date != null)
             {
-                collection = collection.Where(shoppingCart => shoppingCart.CustomerID == filter.CustomerID 
+                collection = collection.Where(shoppingCart => shoppingCart.CustomerID == filter.CustomerID
                 && shoppingCart.Date == filter.Date);
             }
             else if (filter?.FoodItemID != null)
@@ -95,7 +96,7 @@ namespace FoodOrders.API.Services
             {
                 collection = collection.Where(shoppingCart => shoppingCart.CustomerID == filter.CustomerID);
             }
-            else if(filter?.Date != null)
+            else if (filter?.Date != null)
             {
                 collection = collection.Where(shoppingCart => shoppingCart.Date == filter.Date);
             }

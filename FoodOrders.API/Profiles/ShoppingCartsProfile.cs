@@ -10,6 +10,8 @@ namespace FoodOrders.API.Profiles
         {
             CreateMap<ShoppingCartContentEntity, ShoppingCartContent>();
             CreateMap<ShoppingCartContent, ShoppingCartContentEntity>();
+            CreateMap<Customer, CustomerEntity>();
+            CreateMap<CustomerEntity, Customer>();
         }
     }
 }

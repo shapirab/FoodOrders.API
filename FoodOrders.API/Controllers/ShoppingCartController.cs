@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
+using FoodOrders.API.Data.DataModels.Dtos;
 using FoodOrders.API.Data.DataModels.Entities;
 using FoodOrders.API.Data.DataModels.Models;
-using FoodOrders.API.Services;
+using FoodOrders.API.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -25,8 +26,7 @@ namespace FoodOrders.API.Controllers
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ShoppingCartContent>>> GetAllCarts
-            (int? customerID, int? foodItemID, DateTime? date, string? searchQuery, 
-            int pageNumber = 1, int pageSize = 10)
+            (QueryDto? filter, string? searchQuery, int pageNumber = 1, int pageSize = 10)
         {
             if (pageSize > maxPageSize)
             {
@@ -34,18 +34,18 @@ namespace FoodOrders.API.Controllers
             }
 
             var(shoppingCartEntities, paginationMetadata) = await shoppingCartService
-                .GetAllShoppingCartsAsync(customerID, foodItemID, date, searchQuery, pageNumber, pageSize);
+                .GetAllShoppingCartsAsync( filter, searchQuery, pageNumber, pageSize);
 
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+            Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
 
             return Ok(mapper.Map<IEnumerable<ShoppingCartContent>>(shoppingCartEntities));
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetShoppingCartById")]
         public async Task<ActionResult<ShoppingCartContent>>GetShoppingCartById(int id)
         {
-            ShoppingCartContentEntity? shoppingCartEntity = await shoppingCartService.GetShoppingCartById(id);
+            ShoppingCartContentEntity? shoppingCartEntity = await shoppingCartService.GetShoppingCartByIdAsync(id);
             if(shoppingCartEntity == null)
             {
                 return NotFound("Shopping cart with this id was not found");
@@ -53,5 +53,15 @@ namespace FoodOrders.API.Controllers
             return Ok(mapper.Map<ShoppingCartContent>(shoppingCartEntity));
         }
 
+        [HttpPost]
+        public async Task<ActionResult<ShoppingCartContent>>AddShoppingCart(ShoppingCartContent shoppingCartContent)
+        {
+            ShoppingCartContentEntity contentEntity = mapper.Map<ShoppingCartContentEntity>(shoppingCartContent);
+            await shoppingCartService.AddShoppingCartAsync(contentEntity);
+            await shoppingCartService.SaveChangesAsync();
+
+            return CreatedAtRoute("GetShoppingCartById", 
+                new { id = shoppingCartContent.Id}, shoppingCartContent);
+        }
     }
 }

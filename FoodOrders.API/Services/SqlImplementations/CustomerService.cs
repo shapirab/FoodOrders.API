@@ -12,7 +12,7 @@ namespace FoodOrders.API.Services.SqlImplementations
 
         public CustomerService(FoodOrdersDbContext context)
         {
-            context = context ?? throw new ArgumentNullException(nameof(context));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         public async Task<bool> AddCustomerAsync(CustomerEntity customer)
         {

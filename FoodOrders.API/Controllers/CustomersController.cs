@@ -4,6 +4,7 @@ using FoodOrders.API.Data.DataModels.Models;
 using FoodOrders.API.Services.Interfaces;
 using FoodOrders.API.Services.SqlImplementations;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -49,6 +50,18 @@ namespace FoodOrders.API.Controllers
                 return NotFound("No customer with the given id was found");
             }            
             return Ok(mapper.Map<Customer>(customerEntity));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<bool>> AddCustomer(Customer customer)
+        {
+            if (customer == null)
+            {
+                return BadRequest("Customer was not provided");
+            }
+            CustomerEntity customerEntity = mapper.Map<CustomerEntity>(customer);
+            await customerService.AddCustomerAsync(customerEntity);
+            return Ok(await customerService.SaveChangesAsync());
         }
     }
 }

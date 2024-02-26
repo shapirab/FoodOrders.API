@@ -1,33 +1,65 @@
 ﻿using FoodOrders.API.Data.DataModels.Entities;
+using FoodOrders.API.Data.DataModels.Models;
+using FoodOrders.API.Data.DbContexts;
 using FoodOrders.API.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodOrders.API.Services.SqlImplementations
 {
     public class FoodItemService : IFoodItemService
     {
-        public Task<bool> AddFoodItemAsync(FoodItemEntity foodItem)
+        private readonly FoodOrdersDbContext context;
+
+        public FoodItemService(FoodOrdersDbContext context)
         {
-            throw new NotImplementedException();
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
+        }
+        public async Task<bool> AddFoodItemAsync(FoodItemEntity foodItem)
+        {
+            await context.FoodItems.AddAsync(foodItem);
+            return await SaveChangesAsync();
         }
 
-        public Task<bool> DeleteFoodItemAsync(int id)
+        public async Task<bool> DeleteFoodItemAsync(int id)
         {
-            throw new NotImplementedException();
+            FoodItemEntity? foodItemEntity = await GetFoodItemByIdAsync(id);
+            if (foodItemEntity != null)
+            {
+                context.Remove(foodItemEntity);
+            }
+            return await SaveChangesAsync();
         }
 
-        public Task<(IEnumerable<FoodItemEntity>, PaginationMetaData)> GetAllFoodItemsAsync(string? searchQuery, int pageNumber, int pageSize)
+        public async Task<(IEnumerable<FoodItemEntity>, PaginationMetaData)> GetAllFoodItemsAsync
+            (string? searchQuery, int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
+            IQueryable<FoodItemEntity> collection = context.FoodItems as IQueryable<FoodItemEntity>;
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                collection = collection.Where(a => a.Name.Contains(searchQuery));
+            }
+
+            int totalItemCount = await collection.CountAsync();
+
+            PaginationMetaData paginationMetadata = new PaginationMetaData(totalItemCount, pageSize, pageNumber);
+
+            var collectionToReturn = await collection.OrderBy(c => c.Name)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (collectionToReturn, paginationMetadata);
         }
 
-        public Task<FoodItemEntity?> GetFoodItemByIdAsync(int id)
+        public async Task<FoodItemEntity?> GetFoodItemByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await context.FoodItems.Where(foodItem => foodItem.Id == id).FirstOrDefaultAsync();
         }
 
-        public Task<bool> SaveChangesAsync()
+        public async Task<bool> SaveChangesAsync()
         {
-            throw new NotImplementedException();
+            return await context.SaveChangesAsync() >= 0;
         }
     }
 }

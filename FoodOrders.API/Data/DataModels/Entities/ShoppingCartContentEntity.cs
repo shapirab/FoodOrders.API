@@ -13,7 +13,7 @@ namespace FoodOrders.API.Data.DataModels.Entities
         public int Quantity { get; set; }
         public int FoodItemID { get; set; }
         [ForeignKey("FoodItemID")]
-        public FoodItem FoodItem { get; set; }
+        public FoodItemEntity FoodItem { get; set; }
         public int CustomerID { get; set; }
         [ForeignKey("CustomerID")]
         public CustomerEntity Customer { get; set; }

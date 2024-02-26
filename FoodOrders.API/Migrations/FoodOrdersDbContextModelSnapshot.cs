@@ -43,6 +43,27 @@ namespace FoodOrders.API.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("FoodOrders.API.Data.DataModels.Entities.FoodItemEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FoodItems");
+                });
+
             modelBuilder.Entity("FoodOrders.API.Data.DataModels.Entities.ShoppingCartContentEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -57,7 +78,7 @@ namespace FoodOrders.API.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("FoodItemId")
+                    b.Property<int>("FoodItemID")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -67,29 +88,9 @@ namespace FoodOrders.API.Migrations
 
                     b.HasIndex("CustomerID");
 
-                    b.HasIndex("FoodItemId");
+                    b.HasIndex("FoodItemID");
 
                     b.ToTable("ShoppingCartContents");
-                });
-
-            modelBuilder.Entity("FoodOrders.API.Data.DataModels.Models.FoodItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FoodItem");
                 });
 
             modelBuilder.Entity("FoodOrders.API.Data.DataModels.Entities.ShoppingCartContentEntity", b =>
@@ -100,9 +101,9 @@ namespace FoodOrders.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FoodOrders.API.Data.DataModels.Models.FoodItem", "FoodItem")
+                    b.HasOne("FoodOrders.API.Data.DataModels.Entities.FoodItemEntity", "FoodItem")
                         .WithMany()
-                        .HasForeignKey("FoodItemId")
+                        .HasForeignKey("FoodItemID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace FoodOrders.API.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class fixedMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,20 +23,6 @@ namespace FoodOrders.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FoodItem",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<double>(type: "float", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FoodItem", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -59,8 +46,9 @@ namespace FoodOrders.API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    FoodItemId = table.Column<int>(type: "int", nullable: false),
-                    CustomerID = table.Column<int>(type: "int", nullable: false)
+                    FoodItemID = table.Column<int>(type: "int", nullable: false),
+                    CustomerID = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,9 +60,9 @@ namespace FoodOrders.API.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ShoppingCartContents_FoodItem_FoodItemId",
-                        column: x => x.FoodItemId,
-                        principalTable: "FoodItem",
+                        name: "FK_ShoppingCartContents_FoodItems_FoodItemID",
+                        column: x => x.FoodItemID,
+                        principalTable: "FoodItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -85,17 +73,14 @@ namespace FoodOrders.API.Migrations
                 column: "CustomerID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShoppingCartContents_FoodItemId",
+                name: "IX_ShoppingCartContents_FoodItemID",
                 table: "ShoppingCartContents",
-                column: "FoodItemId");
+                column: "FoodItemID");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "FoodItems");
-
             migrationBuilder.DropTable(
                 name: "ShoppingCartContents");
 
@@ -103,7 +88,7 @@ namespace FoodOrders.API.Migrations
                 name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "FoodItem");
+                name: "FoodItems");
         }
     }
 }

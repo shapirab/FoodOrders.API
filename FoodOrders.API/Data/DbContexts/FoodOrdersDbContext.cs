@@ -10,7 +10,11 @@ namespace FoodOrders.API.Data.DbContexts
             
         }
         public DbSet<CustomerEntity>Customers { get; set; }
+
+        public DbSet<FoodItemEntity> FoodItems { get; set; }
+
         public DbSet<ShoppingCartContentEntity> ShoppingCartContents { get; set;}
+       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

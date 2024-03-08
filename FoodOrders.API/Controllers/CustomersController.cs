@@ -63,5 +63,17 @@ namespace FoodOrders.API.Controllers
             await customerService.AddCustomerAsync(customerEntity);
             return Ok(await customerService.SaveChangesAsync());
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<bool>> DeleteCustomer(int id)
+        {
+            CustomerEntity? customerEntity = await customerService.GetCustomerByIdAsync(id);
+            if (customerEntity == null)
+            {
+                return NotFound("An item with this id does not exist");
+            }
+            await customerService.DeleteCustomerAsync(id);
+            return Ok(await customerService.SaveChangesAsync());
+        }
     }
 }

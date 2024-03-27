@@ -42,7 +42,7 @@ namespace FoodOrders.API.Controllers
             return Ok(mapper.Map<IEnumerable<ShoppingCartContent>>(shoppingCartEntities));
         }
 
-        [HttpGet("{id}", Name = "GetShoppingCartById")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<ShoppingCartContent>>GetShoppingCartById(int id)
         {
             ShoppingCartContentEntity? shoppingCartEntity = await shoppingCartService.GetShoppingCartByIdAsync(id);
@@ -54,14 +54,24 @@ namespace FoodOrders.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ShoppingCartContent>>AddShoppingCart(ShoppingCartContent shoppingCartContent)
+        public async Task<ActionResult<bool>>AddShoppingCart(ShoppingCartContentDto shoppingCartContent)
         {
             ShoppingCartContentEntity contentEntity = mapper.Map<ShoppingCartContentEntity>(shoppingCartContent);
             await shoppingCartService.AddShoppingCartAsync(contentEntity);
-            await shoppingCartService.SaveChangesAsync();
+            return Ok(await shoppingCartService.SaveChangesAsync());
+        }
 
-            return CreatedAtRoute("GetShoppingCartById", 
-                new { id = shoppingCartContent.Id}, shoppingCartContent);
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<bool>>DeleteShoppingCart(int id)
+        {
+            ShoppingCartContentEntity? shoppingCartContentEntity =
+                await shoppingCartService.GetShoppingCartByIdAsync(id);
+            if(shoppingCartContentEntity == null)
+            {
+                return BadRequest("No shopping cart with this id was found");
+            }
+            await shoppingCartService.DeleteShoppingCartAsync(id);
+            return Ok(await  shoppingCartService.SaveChangesAsync());
         }
     }
 }

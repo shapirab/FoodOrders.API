@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FoodOrders.API.Data.DataModels.Dtos;
 using FoodOrders.API.Data.DataModels.Entities;
 using FoodOrders.API.Data.DataModels.Models;
 using FoodOrders.API.Services.Interfaces;
@@ -53,7 +54,7 @@ namespace FoodOrders.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> AddCustomer(Customer customer)
+        public async Task<ActionResult<bool>> AddCustomer(CustomerDto customer)
         {
             if (customer == null)
             {

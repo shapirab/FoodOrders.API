@@ -57,6 +57,7 @@ namespace FoodOrders.API.Controllers
                 return BadRequest("Please add food item");
             }
             FoodItemEntity foodItemEntity = mapper.Map<FoodItemEntity>(foodItem);
+            await foodItemService.AddFoodItemAsync(foodItemEntity);
             return Ok(await foodItemService.SaveChangesAsync());
         }
 

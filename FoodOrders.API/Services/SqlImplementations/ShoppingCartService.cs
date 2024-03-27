@@ -4,6 +4,7 @@ using FoodOrders.API.Data.DataModels.Models;
 using FoodOrders.API.Data.DbContexts;
 using FoodOrders.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FoodOrders.API.Services.SqlImplementations
 {
@@ -16,20 +17,18 @@ namespace FoodOrders.API.Services.SqlImplementations
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<bool> AddShoppingCartAsync(ShoppingCartContentEntity content)
+        public async Task AddShoppingCartAsync(ShoppingCartContentEntity content)
         {
             await _context.ShoppingCartContents.AddAsync(content);
-            return await SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteShoppingCartAsync(int id)
+        public async Task DeleteShoppingCartAsync(int id)
         {
             ShoppingCartContentEntity? shoppingCart = await GetShoppingCartByIdAsync(id);
             if (shoppingCart != null)
             {
                 _context.ShoppingCartContents.Remove(shoppingCart);
             }
-            return await SaveChangesAsync();
         }
 
         public async Task<(IEnumerable<ShoppingCartContentEntity>, PaginationMetaData)> GetAllShoppingCartsAsync
@@ -37,6 +36,23 @@ namespace FoodOrders.API.Services.SqlImplementations
         {
             IQueryable<ShoppingCartContentEntity> collection =
                 _context.ShoppingCartContents as IQueryable<ShoppingCartContentEntity>;
+
+            if(filter != null)
+            {
+                if(filter.CustomerID != null && filter.FoodItemID != null)
+                {
+                    collection = collection.Where(a => a.CustomerID == filter.CustomerID &&
+                    a.FoodItemID == filter.FoodItemID);
+                }
+                else if(filter.CustomerID != null)
+                {
+                    collection = collection.Where(a => a.CustomerID == filter.CustomerID);
+                }
+                else if(filter.FoodItemID != null)
+                {
+                    collection = collection.Where(a => a.FoodItemID == filter.FoodItemID);
+                }
+            }
 
             if (!string.IsNullOrEmpty(searchQuery))
             {
@@ -61,7 +77,6 @@ namespace FoodOrders.API.Services.SqlImplementations
             return await _context.ShoppingCartContents
                 .Where(shoppingCart => shoppingCart.Id == id).FirstOrDefaultAsync();
         }
-
 
         public async Task<bool> SaveChangesAsync()
         {

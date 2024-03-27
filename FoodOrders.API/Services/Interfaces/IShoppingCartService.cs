@@ -9,8 +9,8 @@ namespace FoodOrders.API.Services.Interfaces
         Task<(IEnumerable<ShoppingCartContentEntity>, PaginationMetaData)> GetAllShoppingCartsAsync
             (QueryDto? filter, string? searchQuery, int pageNumber, int pageSize);
         Task<ShoppingCartContentEntity?> GetShoppingCartByIdAsync(int id);
-        Task<bool> AddShoppingCartAsync(ShoppingCartContentEntity content);
-        Task<bool> DeleteShoppingCartAsync(int id);
+        Task AddShoppingCartAsync(ShoppingCartContentEntity content);
+        Task DeleteShoppingCartAsync(int id);
         Task<bool> SaveChangesAsync();
 
     }
